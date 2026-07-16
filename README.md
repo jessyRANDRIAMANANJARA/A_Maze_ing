@@ -1,6 +1,6 @@
 # A-MAZE-Ing
 
-**Generate mazes, watch them solve themselves in the terminal, and export the result** — built for the [42](https://42heilbronn.de/)
+**Generate mazes, watch them solve themselves in the terminal, and export the result**
 
 ![Example maze rendered in the terminal with walls, path, and 42 pattern](maze_example.png)
 
@@ -148,8 +148,8 @@ directions = solver.path_to_directions(path)
 
 | | Focus |
 |---|--------|
-| **mnestere** | BFS, terminal UI / rendering, architecture, docs & tests |
-| **mawelsch** | DFS & Wilson, config system, build/Makefile & packaging, output format & validation, docs & tests |
+| **hrandri2** | BFS, terminal UI / rendering, architecture, docs & tests |
+| **tusandri** | DFS & Wilson, config system, build/Makefile & packaging, output format & validation, docs & tests |
 
 ---
 
@@ -171,4 +171,4 @@ AI assistance was used for refactoring and **mypy**-oriented typing fixes, bug f
 
 ---
 
-**Made with care at 42 Heilbronn**
+**Made with care at 42 Antananarivo**
