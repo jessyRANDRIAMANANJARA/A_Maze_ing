@@ -1,0 +1,12 @@
+# Mandatory Configuration Keys
+width = 14
+height = 10
+entry = 9, 9
+exit = 0, 0
+perfect = true
+output_file = output.txt
+
+#seed = 42
+# Options are 'dfs' for Depth First Search or 'wilson' for Wilson's algorithm.
+# The default algorithm is 'dfs'.
+algorithm = dfs
