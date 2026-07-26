@@ -9,6 +9,12 @@ def get_int_int_tuple(val_1: int, val_2: int) -> tuple[int, int]:
     return (val_1, val_2)
 
 
+def check_42_pattern_avilability(height: int, width: int) -> str:
+    if int(width) >= 14 and int(height) >= 10:
+        return ""
+    return "Maze is too small to fit the 42 pattern, omitting it!"
+
+
 def main() -> None:
     """Parse config and run maze generation with rendering."""
     if len(argv) < 2:
@@ -51,6 +57,8 @@ def main() -> None:
         output=str(configs["output_file"]),
         delay=0.075,
     ).run()
+
+    print(check_42_pattern_avilability(int(configs["height"]), int(configs["width"])))
 
 
 if __name__ == "__main__":
