@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-from typing import Callable, Literal, Type, Optional, Any
+import itertools
+import os
+from collections.abc import Callable
+from enum import Enum
+from typing import Any, Literal, Optional
+
+from termcolor import colored
+
 from mazegen import (
     MazeCell,
     MazeGenerator,
 )
-from termcolor import colored
-from enum import Enum
 from output_file_generation import generate_output_file
-import os
 
+WALL_MARKER = "██"
+# WALL_MARKER = "🧨"
 
 def colorize(
     wall_color: str,
@@ -36,7 +42,7 @@ def colorize(
 
     def _colorize(text: str, is_wall: bool) -> str:
 
-        if path_color and text == "▒▒":
+        if path_color and text == WALL_MARKER:
             return colored(text, path_color, background)
 
         if text == start_marker:
@@ -52,28 +58,26 @@ def colorize(
 
 
 class Characters(Enum):
-    """Readable enum for wall-connection cases."""
-
     NONE = ((False, False, False, False), " ")
     NORTH = ((True, False, False, False), "╵")
     SOUTH = ((False, True, False, False), "╷")
     EAST = ((False, False, True, False), "╶")
     WEST = ((False, False, False, True), "╴")
 
-    NORTH_SOUTH = ((True, True, False, False), "│")
-    EAST_WEST = ((False, False, True, True), "─")
+    NORTH_SOUTH = ((True, True, False, False), "║")
+    EAST_WEST = ((False, False, True, True), "═")
 
-    NORTH_EAST = ((True, False, True, False), "╰")
-    NORTH_WEST = ((True, False, False, True), "╯")
-    SOUTH_EAST = ((False, True, True, False), "╭")
-    SOUTH_WEST = ((False, True, False, True), "╮")
+    NORTH_EAST = ((True, False, True, False), "╚")
+    NORTH_WEST = ((True, False, False, True), "╝")
+    SOUTH_EAST = ((False, True, True, False), "╔")
+    SOUTH_WEST = ((False, True, False, True), "╗")
 
-    NORTH_SOUTH_EAST = ((True, True, True, False), "├")
-    NORTH_SOUTH_WEST = ((True, True, False, True), "┤")
-    SOUTH_EAST_WEST = ((False, True, True, True), "┬")
-    NORTH_EAST_WEST = ((True, False, True, True), "┴")
+    NORTH_SOUTH_EAST = ((True, True, True, False), "╠")
+    NORTH_SOUTH_WEST = ((True, True, False, True), "╣")
+    SOUTH_EAST_WEST = ((False, True, True, True), "╦")
+    NORTH_EAST_WEST = ((True, False, True, True), "╩")
 
-    NORTH_SOUTH_EAST_WEST = ((True, True, True, True), "┼")
+    NORTH_SOUTH_EAST_WEST = ((True, True, True, True), "╬")
 
     def __init__(self, tpl: tuple[bool, bool, bool, bool], char: str) -> None:
         self.tuple: tuple[bool, bool, bool, bool] = tpl
@@ -111,9 +115,7 @@ class MazeRenderer:
         self._apply_solved_path(content_grid, path)
         self._mark_endpoints(content_grid, start=start, end=end)
 
-        return self._render_lines(
-            is_wall, content_grid, grid_h, grid_w, colorizer
-        )
+        return self._render_lines(is_wall, content_grid, grid_h, grid_w, colorizer)
 
     def _init_grids(
         self, rows: int, cols: int
@@ -164,13 +166,13 @@ class MazeRenderer:
                 cell: MazeCell = maze[r][c]
                 if not cell.fourty_two_pattern:
                     continue
-                content_grid[r * 2 + 1][c * 2 + 1] = "░░"
+                content_grid[r * 2 + 1][c * 2 + 1] = "▓▓"
 
     def _apply_solved_path(
         self,
         content_grid: list[list[str]],
         path: list[tuple[int, int]] | None,
-        marker: str = "▒▒",
+        marker: str = WALL_MARKER,
     ) -> None:
         """Apply solved path markers and connectors to grid."""
         if not path:
@@ -193,22 +195,22 @@ class MazeRenderer:
         self, content_grid: list[list[str]], path: list[tuple[int, int]]
     ) -> None:
         """Connect consecutive nodes with segments along corridors."""
-        for (r1, c1), (r2, c2) in zip(path, path[1:]):
+        for (r1, c1), (r2, c2) in itertools.pairwise(path):
             cr1, cc1 = r1 * 2 + 1, c1 * 2 + 1
             # Horizontal step
             if r1 == r2 and c2 == c1 + 1:
                 # east corridor between centers
-                content_grid[cr1][cc1 + 1] = "▒▒"
+                content_grid[cr1][cc1 + 1] = WALL_MARKER
             elif r1 == r2 and c2 == c1 - 1:
                 # west corridor between centers
-                content_grid[cr1][cc1 - 1] = "▒▒"
+                content_grid[cr1][cc1 - 1] = WALL_MARKER
             # Vertical step
             elif c1 == c2 and r2 == r1 + 1:
                 # south corridor between centers
-                content_grid[cr1 + 1][cc1] = "▒▒"
+                content_grid[cr1 + 1][cc1] = WALL_MARKER
             elif c1 == c2 and r2 == r1 - 1:
                 # north corridor between centers
-                content_grid[cr1 - 1][cc1] = "▒▒"
+                content_grid[cr1 - 1][cc1] = WALL_MARKER
 
     def _mark_endpoints(
         self,
@@ -216,8 +218,8 @@ class MazeRenderer:
         *,
         start: tuple[int, int],
         end: tuple[int, int],
-        start_marker: str = "E ",
-        end_marker: str = "S ",
+        start_marker: str = "🚀",
+        end_marker: str = "💥",
     ) -> None:
         """Mark start and end positions on content grid."""
         start_coord = start
@@ -310,8 +312,8 @@ class Terminal:
     def __init__(
         self,
         *,
-        maze_generator_cls: Type[MazeGenerator],
-        pathfinder_cls: Type[Any],
+        maze_generator_cls: type[MazeGenerator],
+        pathfinder_cls: type[Any],
         width: int,
         height: int,
         seed: int,
@@ -322,27 +324,28 @@ class Terminal:
         output: str,
     ) -> None:
         """Initialize Terminal with maze and rendering config."""
-        self.maze_generator_cls: Type[MazeGenerator] = maze_generator_cls
-        self.pathfinder_cls: Type[Any] = pathfinder_cls
+        self.maze_generator_cls: type[MazeGenerator] = maze_generator_cls
+        self.pathfinder_cls: type[Any] = pathfinder_cls
         self.width: int = width
         self.height: int = height
         self.seed: int = seed
-        self.entry: tuple[int, int] = end
-        self.exit: tuple[int, int] = entry
+        self.entry: tuple[int, int] = entry
+        self.exit: tuple[int, int] = end
         self.delay: float = delay
         self.perfect: bool = perfect
         self.output: str = output
 
         self.renderer: MazeRenderer = MazeRenderer()
-        self.wall_color: str = "magenta"
-        self.fourty_two: str = "red"
-        self.path_color: str = "magenta"
+        self.wall_color: str = "blue"
+        self.fourty_two: str = "light_yellow"
+        self.path_color: str = "red"
         self.background: str | None = "on_black"
         self.colorizer = self._build_colorizer()
 
         self.maze: list[list[MazeCell]] | None = None
         self.path: list[tuple[int, int]] | None = None
         self.show_path: bool = True
+        self.use_tj_pattern: bool = False
 
     @staticmethod
     def _clear_screen() -> None:
@@ -404,19 +407,11 @@ class Terminal:
         while True:
             self._clear_screen()
             print("\n=== Color Configuration Menu ===\n")
-            print(
-                f"1 - Wall Color: {self._print_colored_color(self.wall_color)}"
-            )
-            print(
-                f"2 - 42 Color: {self._print_colored_color(self.fourty_two)}"
-            )
-            print(
-                f"3 - Path Color: {self._print_colored_color(self.path_color)}"
-            )
+            print(f"1 - Wall Color: {self._print_colored_color(self.wall_color)}")
+            print(f"2 - 42 Color: {self._print_colored_color(self.fourty_two)}")
+            print(f"3 - Path Color: {self._print_colored_color(self.path_color)}")
             bg_display = (
-                self.background.replace("on_", "")
-                if self.background
-                else "None"
+                self.background.replace("on_", "") if self.background else "None"
             )
             print(f"4 - Background: {bg_display}")
             if self.maze and self.renderer:
@@ -460,9 +455,7 @@ class Terminal:
                                 print("  1. None (Default)")
                             else:
                                 bg_name = bg.replace("on_", "")
-                                print(
-                                    f"  {key}. {colored(bg_name, 'white', bg)}"
-                                )
+                                print(f"  {key}. {colored(bg_name, 'white', bg)}")
                         choice: str = readchar.readchar()
                         if choice in self.BACKGROUND_COLORS:
                             self.background = self.BACKGROUND_COLORS[choice]
@@ -480,17 +473,13 @@ class Terminal:
             except KeyboardInterrupt:
                 return
 
-    def _render_current_maze(
-        self, force_show_path: bool | None = None
-    ) -> None:
+    def _render_current_maze(self, force_show_path: bool | None = None) -> None:
         """Render and display current maze with optional path."""
         if self.maze is None:
             print("No maze generated yet. Press SPACE to generate one.")
             return
 
-        show_path = (
-            self.show_path if force_show_path is None else force_show_path
-        )
+        show_path = self.show_path if force_show_path is None else force_show_path
         rendered = self.renderer.render_maze_walls(
             self.maze,
             self.colorizer,
@@ -504,9 +493,11 @@ class Terminal:
             "==== MENU ===="
             + f"\n[Path: {'VISIBLE' if show_path else 'HIDDEN'}]\n"
             + "Press:\n"
-            + "[P] to show the path\n[C] to change the colors\n[SPACE] to "
-            + "regenerate the maze"
-            + "\n[Q] to quit.\n"
+            + "[SPACE] to regenerate the maze\n"
+            + "[P]     to show the path\n"
+            + "[C]     to change the colors\n"
+            + "[T]     to change Pattern\n"
+            + "[Q]     to quit.\n"
         )
 
     def _animate_path(self) -> None:
@@ -545,7 +536,10 @@ class Terminal:
     def _generate_maze_and_path(self) -> None:
         """Generate maze and solve with pathfinder algorithm."""
         generator: MazeGenerator = self.maze_generator_cls(
-            width=self.width, height=self.height, seed=self.seed
+            width=self.width,
+            height=self.height,
+            seed=self.seed,
+            use_tj_pattern=self.use_tj_pattern,
         )
         self.maze = generator.generate_maze()
         if self.entry == self.exit:
@@ -592,6 +586,7 @@ class Terminal:
         print("║  SPACE - Generate maze                     ║")
         print("║  P     - Toggle path visibility            ║")
         print("║  C     - Change colors                     ║")
+        print("║  T     - Change Pattern                    ║")
         print("║  Q     - Quit                              ║")
         print("╚════════════════════════════════════════════╝")
         print(
@@ -634,10 +629,20 @@ class Terminal:
                         else:
                             self._clear_screen()
                             print(
-                                "Colors updated! Press SPACE to "
-                                + "generate a maze.\n"
+                                "Colors updated! Press SPACE to " + "generate a maze.\n"
                             )
+                    case "t":
+                        self.use_tj_pattern = not self.use_tj_pattern
+                        self._clear_screen()
+                        label = "TJ" if self.use_tj_pattern else "Standard"
+                        print(f"Motif 42 : {label} — génération...\n")
+                        self._generate_maze_and_path()
 
+                        if self.show_path and self.path:
+                            self._animate_path()
+                            self._render_current_maze(force_show_path=True)
+                        else:
+                            self._render_current_maze(force_show_path=False)
             except KeyboardInterrupt:
                 print("\n\nInterrupted. Goodbye!")
                 break

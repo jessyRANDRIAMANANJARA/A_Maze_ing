@@ -37,5 +37,4 @@ def generate_output_file(
         file.write(",")
         file.write(str(start[1]))
         file.write("\n")
-        for direction in path:
-            file.write(direction)
+        file.writelines(path)

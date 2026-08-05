@@ -1,8 +1,9 @@
+import sys
+
+
 def read_config(config_file: "str") -> dict[str, str | int | bool]:
     """Parse configuration file and validate required fields."""
-    required = set(
-        ["width", "height", "entry.x", "entry.y", "exit.x", "exit.y"]
-    )
+    required = {"width", "height", "entry.x", "entry.y", "exit.x", "exit.y"}
     configs: dict[str, str | int | bool] = {}
     with open(config_file) as config:
         for line in config:
@@ -15,15 +16,15 @@ def read_config(config_file: "str") -> dict[str, str | int | bool]:
             if key == "width":
                 if configs.get("width") is None:
                     configs["width"] = val
-                    if int(configs["width"]) <= 0:
-                        raise ValueError("width cannot be less than 1")
+                    if int(configs["width"]) <= 5:
+                        raise ValueError(f"width must be at least 5 (got {configs['width']})")
                 else:
                     raise ValueError("Width is defined multiple times!")
             elif key == "height":
                 if configs.get("height") is None:
                     configs["height"] = val
-                    if int(configs["height"]) <= 0:
-                        raise ValueError("height cannot be less than 1")
+                    if int(configs["height"]) <= 5:
+                        raise ValueError(f"height must be at least 5 (got {configs['height']})")
                 else:
                     raise ValueError("Height is defined multiple times!")
             elif key == "entry":
@@ -110,11 +111,18 @@ def read_config(config_file: "str") -> dict[str, str | int | bool]:
             "width, height, entry and exit must be defined in the config file"
         )
     if configs.get("output_file") is None or configs.get("output_file") == "":
-        configs["output_file"] = "output.txt"
+        print(
+            "Error: No output file specified!!!!"
+        )
+        sys.exit(1)
     if configs.get("algorithm") is None or configs.get("algorithm") == "":
         configs["algorithm"] = "dfs"
     if configs.get("seed") is None or configs.get("seed") == "":
         configs["seed"] = -1
     if configs.get("perfect") is None or configs.get("perfect") == "":
-        configs["perfect"] = False
+        # configs["perfect"] = False
+        print(
+            "Error: No perfect option specified, please specify True or False"
+        )
+        sys.exit(1)
     return configs

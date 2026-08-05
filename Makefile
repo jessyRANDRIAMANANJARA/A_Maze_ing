@@ -44,6 +44,7 @@ clean:
 	find . -name .pytest_cache -exec rm -rf {} +
 	find . -name "*.pyc" -delete
 	find . -name "*.pyo" -delete
+	find . -name "output.txt" -delete
 
 lint:
 	uv run flake8 **/*.py

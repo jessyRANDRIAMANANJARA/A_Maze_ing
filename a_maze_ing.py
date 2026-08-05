@@ -1,7 +1,8 @@
 from sys import argv
+
 from config_reader import read_config
+from mazegen import BFS, DFSearch, WilsonsAlgorithm
 from render import Terminal
-from mazegen import DFSearch, WilsonsAlgorithm, BFS
 
 
 def get_int_int_tuple(val_1: int, val_2: int) -> tuple[int, int]:
@@ -55,7 +56,7 @@ def main() -> None:
         seed=int(configs["seed"]),
         perfect=bool(configs["perfect"]),
         output=str(configs["output_file"]),
-        delay=0.075,
+        delay=0.065,
     ).run()
 
     print(check_42_pattern_avilability(int(configs["height"]), int(configs["width"])))

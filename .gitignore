@@ -12,3 +12,4 @@ uv.lock
 .mypy_cache
 .python-version
 output.txt
+env_test.py

@@ -1,7 +1,7 @@
-from .maze_gen import MazeCell, DFSearch, MazeGenerator
-from .maze_gen import WilsonsAlgorithm
+from .maze_gen import DFSearch, MazeCell, MazeGenerator, WilsonsAlgorithm
 from .bfs import BFS
 
-__all__ = ["MazeCell", "DFSearch", "MazeGenerator", "WilsonsAlgorithm", "BFS"]
+
+__all__ = ["BFS", "DFSearch", "MazeCell", "MazeGenerator", "WilsonsAlgorithm"]
 __version__ = "1.0.0"
-__author__ = "Matvii Nesterenko, Max Welsch"
+__author__ = "hrandri2, tusandri"
