@@ -13,8 +13,7 @@ from mazegen import (
 )
 from output_file_generation import generate_output_file
 
-WALL_MARKER = "██"
-# WALL_MARKER = "🧨"
+WALL_MARKER = "⚠ "
 
 def colorize(
     wall_color: str,
@@ -166,7 +165,7 @@ class MazeRenderer:
                 cell: MazeCell = maze[r][c]
                 if not cell.fourty_two_pattern:
                     continue
-                content_grid[r * 2 + 1][c * 2 + 1] = "▓▓"
+                content_grid[r * 2 + 1][c * 2 + 1] = "⚡︎"
 
     def _apply_solved_path(
         self,
@@ -218,8 +217,8 @@ class MazeRenderer:
         *,
         start: tuple[int, int],
         end: tuple[int, int],
-        start_marker: str = "🚀",
-        end_marker: str = "💥",
+        start_marker: str = "🧍",
+        end_marker: str = "🎖️ ",
     ) -> None:
         """Mark start and end positions on content grid."""
         start_coord = start
