@@ -1,8 +1,8 @@
 # Mandatory Configuration Keys
-WIDTH       = 16
-height      = 16
+WIDTH       = 13
+height      = 9
 entry       = 0, 0
-exit        = 15, 15
+exit        = 8, 8
 perfect     = true
 output_file = output.txt
 

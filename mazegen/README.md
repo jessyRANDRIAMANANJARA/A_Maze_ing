@@ -1,3 +1,4 @@
+** This project has been created as part of the 42 curriculum by tusandri, hrandri2 **
 # mazegen - Maze Generation Library
 
 Core maze generation and pathfinding module for A-MAZE-Ing.
@@ -44,17 +45,23 @@ Breadth-First Search implementation for maze solving:
 ## Usage
 
 ```python
-from mazegen import DFSearch, BFS, MazeCell
+from mazegen import DFSearch, BFS
+from output_file_generation import generate_output_file
 
-# Generate a 20x20 maze with seed 42
-generator = DFSearch(width=20, height=20, seed=42)
-maze = generator.generate_maze()
-generator.make_imperfect()
+gen = DFSearch(width=16, height=16, seed=42)
+maze = gen.generate_maze()
 
-# Find path from (0,0) to (19,19)
 solver = BFS()
-path = solver.pathfind(maze, start=(0,0), end=(19,19))
+path = solver.pathfind(maze, start=(0, 0), end=(15, 15))
 directions = solver.path_to_directions(path)
+
+generate_output_file(
+    maze=maze,
+    path=directions,
+    start=(0, 0),
+    end=(15, 15),
+    filename="output.txt",
+)
 ```
 
 ## Module Exports

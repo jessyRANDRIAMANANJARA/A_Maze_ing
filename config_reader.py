@@ -16,15 +16,15 @@ def read_config(config_file: "str") -> dict[str, str | int | bool]:
             if key == "width":
                 if configs.get("width") is None:
                     configs["width"] = val
-                    if int(configs["width"]) <= 5:
-                        raise ValueError(f"width must be at least 5 (got {configs['width']})")
+                    if int(configs["width"]) <= 5 or int(configs["width"]) >= 60:
+                        raise ValueError(f"width must be at least 5 and less than 60 (got {configs['width']})")
                 else:
                     raise ValueError("Width is defined multiple times!")
             elif key == "height":
                 if configs.get("height") is None:
                     configs["height"] = val
-                    if int(configs["height"]) <= 5:
-                        raise ValueError(f"height must be at least 5 (got {configs['height']})")
+                    if int(configs["height"]) <= 5 or int(configs["height"]) >= 60:
+                        raise ValueError(f"height must be at least 5 and less than 60 (got {configs['height']})")
                 else:
                     raise ValueError("Height is defined multiple times!")
             elif key == "entry":
@@ -32,20 +32,21 @@ def read_config(config_file: "str") -> dict[str, str | int | bool]:
                     configs.get("entry.x") is None
                     and configs.get("entry.y") is None
                 ):
-                    if "," not in val:
-                        raise ValueError("Expected entry in this format: x,y")
-                    x, y = map(str.strip, val.split(",", 1))
-                    if int(x) < 0 or int(y) < 0:
-                        raise ValueError("Coordinates cannot be negative!")
-                    if int(x) >= int(configs.get("width", -1)) or int(
-                        y
-                    ) >= int(configs.get("height", -1)):
-                        raise ValueError(
-                            "Coordinates cannot be outside of "
-                            + "the maze borders!"
-                        )
-                    configs["entry.x"] = int(x)
-                    configs["entry.y"] = int(y)
+                    if configs["width"] and configs["height"]:
+                        if "," not in val:
+                            raise ValueError("Expected entry in this format: x,y")
+                        x, y = map(str.strip, val.split(",", 1))
+                        if int(x) < 0 or int(y) < 0:
+                            raise ValueError("Coordinates cannot be negative!")
+                        if int(x) >= int(configs.get("width", -1)) or int(
+                            y
+                        ) >= int(configs.get("height", -1)):
+                            raise ValueError(
+                                "Coordinates cannot be outside of "
+                                + "the maze borders!"
+                            )
+                        configs["entry.x"] = int(x)
+                        configs["entry.y"] = int(y)
                 else:
                     raise ValueError("Entry is defined multiple times!")
             elif key == "exit":
@@ -53,6 +54,21 @@ def read_config(config_file: "str") -> dict[str, str | int | bool]:
                     configs.get("exit.x") is None
                     and configs.get("exit.y") is None
                 ):
+                    if configs["width"] and configs["height"]:
+                        if "," not in val:
+                            raise ValueError("Expected entry in this format: x,y")
+                        x, y = map(str.strip, val.split(",", 1))
+                        if int(x) < 0 or int(y) < 0:
+                            raise ValueError("Coordinates cannot be negative!")
+                        if int(x) >= int(configs.get("width", -1)) or int(
+                            y
+                        ) >= int(configs.get("height", -1)):
+                            raise ValueError(
+                                "Coordinates cannot be outside of "
+                                + "the maze borders!"
+                            )
+                        configs["exit.x"] = int(x)
+                        configs["exit.y"] = int(y)
                     if "," not in val:
                         raise ValueError("Expected entry in this format: x,y")
                     x, y = map(str.strip, val.split(",", 1))

@@ -22,7 +22,8 @@ install:
 	uv pip install termcolor; \
 	uv pip install readchar; \
 	uv pip install flake8; \
-	uv pip install mypy
+	uv pip install mypy; \
+	uv pip install pydocstyle
 
 run:
 	@if [ ! -d .venv ]; then \
@@ -48,14 +49,12 @@ clean:
 
 lint:
 	uv run flake8 **/*.py
+	uv run flake8 --select=D **/*.py
+	uv run flake8 --max-line-length=79 --select=D .
 	uv run mypy . --warn-return-any \
 	--warn-unused-ignores \
 	--ignore-missing-imports \
 	--disallow-untyped-defs \
 	--check-untyped-defs
-
-lint-strict: 
-	uv run flake8 **/*.py
-	uv run mypy . --strict
 
 .PHONY: install, run, debug, clean, lint, lint-strict

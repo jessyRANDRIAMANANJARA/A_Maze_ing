@@ -18,8 +18,8 @@ def check_42_pattern_avilability(height: int, width: int) -> str:
 
 def main() -> None:
     """Parse config and run maze generation with rendering."""
-    if len(argv) < 2:
-        print("No config file given. Aborting...")
+    if len(argv) != 2:
+        print("Invalid number of arguments. Please provide a config file.")
         return
     config = argv[1]
     try:
@@ -44,8 +44,8 @@ def main() -> None:
     else:
         gen = WilsonsAlgorithm
     Terminal(
-        height=int(configs["height"]),
-        width=int(configs["width"]),
+        width=int(configs["height"]),
+        height=int(configs["width"]),
         entry=(
             int(configs["entry.x"]),
             int(configs["entry.y"]),
@@ -58,7 +58,7 @@ def main() -> None:
         output=str(configs["output_file"]),
         delay=0.065,
     ).run()
-
+    
     print(check_42_pattern_avilability(int(configs["height"]), int(configs["width"])))
 
 

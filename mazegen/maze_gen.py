@@ -254,8 +254,11 @@ class WilsonsAlgorithm(MazeGenerator):
             available.remove(pattern_cell)
         unvisited = available.copy()
         existing_maze = set()
-        first_maze_cell_np = tuple(self.rng.choice(available))
-        cell_coords = (int(first_maze_cell_np[0]), int(first_maze_cell_np[1]))
+        first_maze_cell_np = self.rng.choice(available)
+        cell_coords: tuple[int, int] = (
+            int(first_maze_cell_np[0]),  # type: ignore[index]
+            int(first_maze_cell_np[1]),  # type: ignore[index]
+        )
         existing_maze.add(cell_coords)
         unvisited.remove(cell_coords)
         move_stack: list[tuple[int, int]] = []
@@ -303,10 +306,10 @@ class WilsonsAlgorithm(MazeGenerator):
             return False
 
         while len(unvisited) != 0:
-            walk_start_np = tuple(self.rng.choice(unvisited))
+            walk_start_np = self.rng.choice(unvisited)
             walk_start: tuple[int, int] = (
-                int(walk_start_np[0]),
-                int(walk_start_np[1]),
+                int(walk_start_np[0]),  # type: ignore[index]
+                int(walk_start_np[1]),  # type: ignore[index]
             )
             move_stack.append(walk_start)
             walk_ended = random_looperased_walk(
@@ -333,8 +336,11 @@ class DFSearch(MazeGenerator):
         available = self.get_all_coords()
         for pattern_cell in self.pattern_coordinates:
             available.remove(pattern_cell)
-        start_np = tuple(self.rng.choice(available))
-        start: tuple[int, int] = (int(start_np[0]), int(start_np[1]))
+        start_np = self.rng.choice(available)
+        start: tuple[int, int] = (
+            int(start_np[0]),  # type: ignore[index]
+            int(start_np[1]),  # type: ignore[index]
+        )
         available.remove(start)
         move_stack = []
         move_stack.append(start)

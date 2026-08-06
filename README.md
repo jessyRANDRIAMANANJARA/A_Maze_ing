@@ -1,9 +1,14 @@
+** This project has been created as part of the 42 curriculum by tusandri, hrandri2 **
+
 # A-MAZE-Ing
 
 **Generate mazes, watch them solve themselves in the terminal, and export the result**
 
-![Example maze rendered in the terminal with walls, path, and 42 pattern](maze_example.png)
+# Description
 
+A-MAZE-Ing is a Python project command-line tool and library for generating, visualizing, and solving 2D grid mazes. Built with strict static typing and zero external runtime dependencies, it provides an interactive terminal interface to render real-time maze generation and pathfinding animations, alongside options to export step-by-step directional solutions.
+
+The project implements two distinct maze generation algorithms: Depth-First Search (DFS) for fast execution with long, winding corridors, and Wilson’s Algorithm for mathematically unbiased, uniform random mazes. For pathfinding, it utilizes Breadth-First Search (BFS) to guarantee finding the shortest path between any two points in the grid.
 ---
 
 ## What you get
@@ -17,7 +22,7 @@
 
 ---
 
-## Quick start
+## Instructions
 
 ### 1. Requirements
 
@@ -59,6 +64,7 @@ python a_maze_ing.py config.txt
 | **Space** | Generate / regenerate the maze (with animated pathfinding) |
 | **P** | Toggle path visibility |
 | **C** | Open the color menu (walls, “42”, path, background + preview) |
+| **T** | Change pattern |
 | **Q** | Quit |
 
 ---
@@ -98,12 +104,13 @@ By default **`output.txt`** (or whatever you set in `output_file`) contains:
 
 ---
 
-## Algorithms (short)
+## Algorithms Choices
 
-| | DFS | Wilson |
-| --- | ----- | -------- |
-| **Character** | Fast; bias toward long corridors | Closer to uniform over mazes; slower on big grids |
-| **Perfect mode** | Produces a perfect maze | Produces a perfect maze |
+**Depth-First Search (DFS) / Recursive Backtracker** generates mazes by aggressively driving forward as far as possible before backtracking via a stack. This mechanism creates a strong directional bias, resulting in long, winding corridors with short dead ends and low branching. Because it visits every cell once and backtracks linearly, it runs quickly in $O(V)$ time, but produces predictable, river-like maze layouts.
+
+**Wilson’s Algorithm** generates mazes using loop-erased random walks to build a uniform spanning tree. Unlike DFS, Wilson’s algorithm is mathematically unbiased, meaning every possible perfect maze configuration on a given grid size has an equal probability of being selected. This generates organic, highly varied mazes without long corridors, though it runs much slower on large grids because initial unattached walks frequently wander before intersecting the existing maze structure.
+
+**Breadth-First Search (BFS)** is used to solve the maze rather than construct it. Operating in expanding concentric waves, BFS explores every cell at distance $d$ before checking distance $d + 1$. In an unweighted grid graph, this level-order traversal guarantees that the first time it reaches the target cell, it has found the absolute shortest path. This reliable shortest-path property makes BFS uniquely suited for pathfinding step exports and step-by-step solver animations.
 
 **BFS** finds a **shortest** path in the grid graph for the current walls (used for animation and for the exported directions).
 
@@ -111,7 +118,7 @@ By default **`output.txt`** (or whatever you set in `output_file`) contains:
 
 ## Project layout
 
-```
+``` sh
 A-MAZE-Ing/
 ├── mazegen/           # Core generation + BFS (installable package)
 │   ├── maze_gen.py
@@ -130,14 +137,22 @@ A-MAZE-Ing/
 
 ```python
 from mazegen import DFSearch, BFS
+from output_file_generation import generate_output_file
 
-generator = DFSearch(width=20, height=20, seed=42)
-maze = generator.generate_maze()
-generator.make_imperfect()
+gen = DFSearch(width=16, height=16, seed=42)
+maze = gen.generate_maze()
 
 solver = BFS()
-path = solver.pathfind(maze, start=(0, 0), end=(19, 19))
+path = solver.pathfind(maze, start=(0, 0), end=(15, 15))
 directions = solver.path_to_directions(path)
+
+generate_output_file(
+    maze=maze,
+    path=directions,
+    start=(0, 0),
+    end=(15, 15),
+    filename="output.txt",
+)
 ```
 
 `WilsonsAlgorithm` and types like `MazeCell` are available from the same package — see `mazegen/__init__.py` and `mazegen/maze_gen.py`.
@@ -153,7 +168,7 @@ directions = solver.path_to_directions(path)
 
 ---
 
-## References
+## Resources
 
 - [Maze generation algorithms](https://en.wikipedia.org/wiki/Maze_generation_algorithm) (Wikipedia)  
 - [BFS](https://www.geeksforgeeks.org/dsa/breadth-first-search-or-bfs-for-a-graph/) — GeeksforGeeks  
@@ -162,25 +177,27 @@ directions = solver.path_to_directions(path)
 - <https://blog.ippon.fr/2025/05/12/uv-un-package-manager-python-adapte-a-la-data-partie-1-theorie-et-fonctionnalites/>
 - <https://blog.ippon.fr/2025/05/14/uv-un-package-manager-python-adapte-a-la-data-partie-2-travaux-pratiques/>
 - <https://blog.ippon.fr/2025/05/12/uv-un-package-manager-python-adapte-a-la-data-partie-1-theorie-et-fonctionnalites/>
+- <https://jessyrandriamananjara.github.io/Animation_Amazing/> Run me
 
 ---
 
 ## AI usage (transparency)
 
 AI assistance was used for:
+
 - refactoring and **mypy**-oriented typing fixes, bug fixes, docstrings, README text, and general code-review suggestions across the codebase.
 
-- Interactive Visualization — DFS vs. Wilson: 
+- Interactive Visualization — DFS vs. Wilson:
 A step-by-step animation (`maze_dfs_vs_wilson_stepper.html`, which can be opened directly in any browser without any dependencies) illustrates the inner workings of the project’s two generation algorithms and its solution algorithm, based precisely on the actual code:
-    - **DFS (`DFSearch.generate_maze()`)** — reconstructs `move_stack` in real time, calls to `get_available_cells()`, opening walls cell by cell (`current_cell.east = True` / `next_cell.west = True`), and backtracking when encountering a dead end.
-    - **Wilson (`WilsonsAlgorithm.generate_maze()`)** — visualizes `existing_maze`, `move_stack`/`movements`, the random walk, and loop removal (`while newest in move_stack: pop()`), and validating all the walls of a step at once using `add_walk_to_maze()`.
-    - **Solution (`BFS.pathfind()`)** — shows `queue.popleft()`, the construction of `parent{}`, and the final reconstruction of the path.
+  - **DFS (`DFSearch.generate_maze()`)** — reconstructs `move_stack` in real time, calls to `get_available_cells()`, opening walls cell by cell (`current_cell.east = True` / `next_cell.west = True`), and backtracking when encountering a dead end.
+  - **Wilson (`WilsonsAlgorithm.generate_maze()`)** — visualizes `existing_maze`, `move_stack`/`movements`, the random walk, and loop removal (`while newest in move_stack: pop()`), and validating all the walls of a step at once using `add_walk_to_maze()`.
+  - **Solution (`BFS.pathfind()`)** — shows `queue.popleft()`, the construction of `parent{}`, and the final reconstruction of the path.
 
-    - Usage
+  - Usage
     Open `maze_dfs_vs_wilson_stepper.html` in a browser, then:
 
     | Key / Button | Action |
-    |---|---|
+    | --- | --- |
     | `Space` | Auto-play / pause |
     | `←` / `→` | Previous / next step |
     | `D` / `W` | Toggle between DFS and Wilson |
@@ -189,6 +206,6 @@ A step-by-step animation (`maze_dfs_vs_wilson_stepper.html`, which can be opened
 
     A badge labeled `ƒ function_name()` shows at all times which function in the code is "currently running," and a log at the bottom of the screen details each operation (variables, broken walls, etc.) as it happens.
 
-    > Educational tool generated for this project— not part of the executable program (`a_maze_ing.py`), used solely to understand and explain the algorithms.
+    Educational tool generated for this project— not part of the executable program (`a_maze_ing.py`), used solely to understand and explain the algorithms.
 
 **Made with care at 42 Antananarivo**
