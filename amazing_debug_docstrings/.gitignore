@@ -1,0 +1,15 @@
+__pycache__/*
+*.pyc
+.venv/
+.pyc
+.vscode
+tests/
+.pytest_cache/
+.mlx/*
+.DS_Store
+a_maze_ing.egg-info/
+uv.lock
+.mypy_cache
+.python-version
+output.txt
+env_test.py

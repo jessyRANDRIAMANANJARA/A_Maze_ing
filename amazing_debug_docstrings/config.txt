@@ -1,0 +1,14 @@
+# Mandatory Configuration Keys
+height      = 9 #
+WIDtH       = 13 #
+exit        = 00000, 0000 #
+perfect     = TRUE #
+output_file = output.txt #
+
+# optional keys
+seed = 2147483647
+# Options are 'dfs' for Depth First Search or 'wilson' for Wilson's algorithm.
+# The default algorithm is 'dfs'.
+algorithm   = dfs
+
+entry       = 8, 00008 #
